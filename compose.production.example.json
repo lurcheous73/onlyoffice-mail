@@ -69,6 +69,10 @@
       }
     },
     "worker": {
+      "networks": {
+        "private": {},
+        "workspace": {}
+      },
       "environment": {
         "TRAINING_ORIGINS": "${OO_TRAINING_ORIGINS}"
       }

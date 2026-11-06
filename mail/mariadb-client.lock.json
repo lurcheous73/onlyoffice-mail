@@ -1,0 +1,19 @@
+{
+  "source": "MariaDB Community 11.8.9 native Debian 13 packages",
+  "platform": "debian:13 amd64",
+  "metadata": "https://mirror.mariadb.org/repo/11.8/debian/dists/trixie/main/binary-amd64/Packages.gz",
+  "packages": [
+    {
+      "name": "mariadb-common",
+      "version": "1:11.8.9+maria~deb13",
+      "url": "https://archive.mariadb.org/mariadb-11.8.9/repo/debian/pool/main/m/mariadb/mariadb-common_11.8.9+maria~deb13_all.deb",
+      "sha256": "40b1f1df61bdd351d89da0bed14a13ac46cf8d3a80c5e69d741a622d8a091b6b"
+    },
+    {
+      "name": "libmariadb3",
+      "version": "1:11.8.9+maria~deb13",
+      "url": "https://archive.mariadb.org/mariadb-11.8.9/repo/debian/pool/main/m/mariadb/libmariadb3_11.8.9+maria~deb13_amd64.deb",
+      "sha256": "0566a944d7fe2a7d042dd76f267ba12334cbdf0ba881a97874e8d24bc044fb0d"
+    }
+  ]
+}

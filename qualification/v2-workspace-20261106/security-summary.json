@@ -1,0 +1,56 @@
+{
+  "scanner": "Trivy 0.76.2",
+  "date": "2026-11-06",
+  "no_ignore_rules": true,
+  "release_gate_passed": false,
+  "images": {
+    "antivirus": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "image_id": "sha256:f82a37f8028261fd74bc2ed8f7601fa25725e2ae5a043fcd900f7809a62569f1",
+      "report_sha256": "c493f57a8d5141dc94df6cfe2aabedebe007552626170e030250a66ede123d2a"
+    },
+    "api": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "image_id": "sha256:bb4576507c618ed444d00e160d6d7951ab17777bf43f3419b637da0f87582ae0",
+      "report_sha256": "dd73b109597e949effc31ab6542e5d52eade63b3591d425e1a5575876772e1ea"
+    },
+    "database": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "image_id": "sha256:da7bde99d67a19e29f1c28bca4d853afb00fbfd47986a6527e8c4fefca466b55",
+      "report_sha256": "6ffe1957b4e65c2f77127bbdac0ef8ea3010f8209f250ee1c30d67c42f1931eb"
+    },
+    "filter": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "image_id": "sha256:4b9c45ab006241f86bf61966acbac009952ecb93fc147b46d1d8f203805b4951",
+      "report_sha256": "a3859b8bdf9e3e08e15934984a34ea1eab004080a3044ea89202b10450fb9a2c"
+    },
+    "mail": {
+      "high": 74,
+      "critical": 0,
+      "unique_cves": 23,
+      "secret_findings": 0,
+      "image_id": "sha256:6f8e8fba08a0441d75de41daa5596149b45524fade484433d81a4e311e3c68b2",
+      "report_sha256": "17902cf13313927a84f883c1be58c1c6a7b46b5517914488dcca43979b14f782"
+    },
+    "redis": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "image_id": "sha256:a9d79d57f1ab997dcb93a8c0e0505520d98c0ea3ff20f0b41f214dda21a67ca8",
+      "report_sha256": "9e60cb07eb9f2787da1363d40c6b96910ac8a03e6083cf8c296db77c33142923"
+    }
+  }
+}

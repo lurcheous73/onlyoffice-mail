@@ -3,6 +3,7 @@ import importlib.util
 import os
 from pathlib import Path
 import shutil
+import socket
 import sqlite3
 import tempfile
 import unittest
@@ -92,6 +93,28 @@ class FileAudit(unittest.TestCase):
         with sqlite3.connect(second) as db:
             db.execute('UPDATE entries SET mtime_ns=mtime_ns+1')
         self.assertFalse(audit.compare(first, second, ignore_ownership=True)['matches'])
+
+    def test_only_named_postfix_sockets_can_be_recorded_as_transient(self):
+        (self.source/'private').mkdir()
+        sock=socket.socket(socket.AF_UNIX);self.addCleanup(sock.close)
+        sock.bind(str(self.source/'private'/'auth'))
+        with self.assertRaises(ValueError):audit.capture(self.source,self.base/'strict.sqlite')
+        result=audit.capture(self.source,self.base/'postfix.sqlite',skip_postfix_sockets=True)
+        self.assertEqual(result['excluded_runtime_sockets'],['private/auth'])
+
+    def test_socket_exception_does_not_hide_unknown_sockets_or_queue_files(self):
+        (self.source/'private').mkdir();(self.source/'private'/'auth').write_bytes(b'queued data')
+        result=audit.capture(self.source,self.base/'ordinary.sqlite',skip_postfix_sockets=True)
+        self.assertEqual(result['excluded_runtime_sockets'],[])
+        sock=socket.socket(socket.AF_UNIX);self.addCleanup(sock.close)
+        sock.bind(str(self.source/'unexpected'))
+        with self.assertRaises(ValueError):audit.capture(self.source,self.base/'unknown.sqlite',skip_postfix_sockets=True)
+
+    def test_legacy_rspamd_endpoint_is_explicit_and_does_not_hide_state(self):
+        sock=socket.socket(socket.AF_UNIX);self.addCleanup(sock.close);sock.bind(str(self.source/'rspamd.sock'))
+        with self.assertRaises(ValueError):audit.capture(self.source,self.base/'strict-rspamd.sqlite')
+        result=audit.capture(self.source,self.base/'legacy-filter.sqlite',skip_rspamd_socket=True)
+        self.assertEqual(result['excluded_runtime_sockets'],['rspamd.sock'])
 
 
 if __name__ == '__main__':

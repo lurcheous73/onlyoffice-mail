@@ -23,7 +23,7 @@ def record(destination):
         info = json.loads(run('docker', 'image', 'inspect', name))[0]
         images[service] = {key: info.get(key) for key in ('Id', 'RepoDigests', 'Created', 'Architecture', 'Os')}
         images[service]['tag'] = name
-        if service == 'antivirus':
+        if service in ('antivirus', 'api', 'filter', 'redis'):
             command = ['apk', 'info', '-v']
         else:
             command = ['dpkg-query', '-W', '-f', '${binary:Package}\t${Version}\n']

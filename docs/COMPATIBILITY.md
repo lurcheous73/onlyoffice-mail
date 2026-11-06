@@ -34,7 +34,9 @@ The API listens on port 8081 inside Docker. OO's `auth_token` query parameter an
 
 OO performs its normal SQL removal after the cleanup call. The API does not duplicate that SQL deletion. Retired mail is retained with a receipt; no automatic purge is implemented. Domain retirement is prevalidated but is not a single atomic operation across all directories. It still requires OO's normal administrative coordination.
 
-The worker reads OO's DKIM SQL records and publishes a per-domain signing map. Synthetic signatures are cryptographically verified in tests. Public DNS records and external reputation are not tested by this internal lab.
+The worker reads OO's DKIM SQL records and publishes a per-domain signing map. It accepts existing PEM keys and OO 12.8's base64 RSA encoding. OO's nonminimal ASN.1 lengths and unsigned integers are converted to canonical DER and cryptographically validated; only the published PEM copy changes. Original SQL keys, selectors and signing identity remain intact. The exact OO encoder is in [CryptoUtil.cs](https://github.com/ONLYOFFICE/CommunityServer/blob/fe1fa7babd093969e939ba6ff45a9fee1299dc93/module/ASC.Mail/ASC.Mail/Utils/CryptoUtil.cs). Existing 1024-bit keys are preserved for compatibility; a future key-strength change requires a separate DNS rollover.
+
+Authenticated signing requires a single MIME From and a matching envelope sender. Postfix independently requires the authenticated user to own that sender or its delegated SQL alias. Negative forgery cases and legitimate cross-domain delegated aliases are tested on both submission ports. Synthetic signatures are cryptographically verified. Public DNS and external reputation are not tested by this internal lab.
 
 ## Mail protocols and deliberate limits
 
@@ -42,6 +44,8 @@ Submission uses 587 with STARTTLS or 465 with implicit TLS, with authenticated s
 
 The preserved data path is `/var/vmail/<storagenode>/<maildir>/Maildir`. Active Sieve scripts, subscriptions, Dovecot UID state, Maildir flags and timestamps belong to the copied mailbox tree. Do not rebuild empty mailboxes and repopulate only message bodies if UID continuity is required.
 
-The current test suite covers OO's SQL/API contract and real protocol clients. **It has not run an actual restored OO browser session.** OO-specific folders/tags, contacts, signatures, cached-only messages, CRM links and all UI administration flows require that separate trial.
+Inbox and the four default special-use folders are subscribed automatically. The real OO 12.8 ImapSync service requires Inbox in its subscribed-folder map; a selectable but unsubscribed Inbox caused receiving to fail in the browser trial. This was corrected and is covered by an actual IMAP LSUB regression check.
+
+The fresh synthetic OO 12.8 browser trial exercises domain/mailbox creation, password changes, sender/alias edits, a mail group, drafts, sending over STARTTLS, receiving and exact binary attachment downloads. It is **not a restored private Workspace session**. Historical folders/tags, contacts, signatures, cached-only messages, CRM links, all administration paths and the oldest attachments still require the copied-data trial. The client uses the real bundled Connector/NET 8.4 driver against the candidate MariaDB; utf8 and utf8mb4 connections were exercised without a server compatibility-mode override.
 
 Advanced historical iRedMail features such as backup-MX transports, domain aliases, BCC policies, administrator sharing and Amavis policy tables are not fully implemented merely because some legacy columns/tables remain. Inventory their use and reject unsupported non-default settings during a migration review. IPv6, multi-architecture builds, high availability and a public administration interface are outside this candidate's tested scope.

@@ -14,6 +14,9 @@ import stat
 import sys
 
 COLUMNS = ('path', 'kind', 'size', 'sha256', 'link', 'mode', 'uid', 'gid', 'mtime_ns')
+POSTFIX_RUNTIME_SOCKETS = frozenset(
+    ['private/'+name for name in ('local','auth','discard','virtual','proxymap','proxywrite','trace','retry','scache','rewrite','defer','bounce','anvil','smtp','verify','lmtp','tlsmgr','relay','error')]
+    + ['public/'+name for name in ('pickup','qmgr','flush','cleanup','postlog','showq')])
 
 
 def unlinked(path):
@@ -42,7 +45,7 @@ def file_hash(path, expected):
     return digest.hexdigest()
 
 
-def capture(root, output):
+def capture(root, output, *, skip_postfix_sockets=False, skip_rspamd_socket=False):
     root, output = unlinked(root), unlinked(output)
     if not root.is_dir():
         raise ValueError('Offline tree must be a directory')
@@ -61,6 +64,7 @@ def capture(root, output):
         db.execute("INSERT INTO meta VALUES ('complete','false')")
         db.commit()
         totals = {'files': 0, 'directories': 0, 'symlinks': 0, 'bytes': 0}
+        excluded_sockets=[]
 
         def visit(path):
             before = path.lstat()
@@ -83,6 +87,11 @@ def capture(root, output):
                 if resolved != root and root not in resolved.parents:
                     raise ValueError('Symlink escapes captured tree')
                 totals['symlinks'] += 1
+            elif stat.S_ISSOCK(before.st_mode) and ((skip_postfix_sockets and name in POSTFIX_RUNTIME_SOCKETS) or (skip_rspamd_socket and name=='rspamd.sock')):
+                # These endpoints contain no queued message. Record the exact
+                # omissions; the restarted daemons recreate their own sockets.
+                excluded_sockets.append(name)
+                return
             else:
                 raise ValueError('Special filesystem entry requires review')
             db.execute('INSERT INTO entries VALUES (?,?,?,?,?,?,?,?,?)',
@@ -100,7 +109,7 @@ def capture(root, output):
         digest = hashlib.sha256()
         for row in db.execute('SELECT * FROM entries ORDER BY path'):
             digest.update((json.dumps(row, ensure_ascii=True, separators=(',', ':')) + '\n').encode())
-        summary = dict(totals, tree_sha256=digest.hexdigest())
+        summary = dict(totals, tree_sha256=digest.hexdigest(), excluded_runtime_sockets=excluded_sockets)
         db.execute("INSERT INTO meta VALUES ('summary',?)", (json.dumps(summary),))
         db.execute("UPDATE meta SET value='true' WHERE key='complete'")
         db.commit()

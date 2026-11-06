@@ -1,8 +1,13 @@
-FROM debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
-RUN apt-get update && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends python3 python3-flask python3-waitress python3-pymysql python3-requests python3-cryptography ca-certificates \
- && useradd -u 5000 -d /nonexistent -s /usr/sbin/nologin mailapi \
- && mkdir -p /opt/oo-api && dpkg-query -W > /opt/oo-api/packages.txt && apt-get clean
+FROM python:3.14-alpine3.23@sha256:0cdfadc8472de8f74a5d3c6e5e49d1b3f059f36cd01a0a0d4015cb1cb89df436
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+RUN apk upgrade --no-cache && apk add --no-cache ca-certificates \
+ && addgroup -g 5000 mailapi \
+ && adduser -D -H -h /nonexistent -u 5000 -G mailapi -s /sbin/nologin mailapi \
+ && mkdir -p /opt/oo-api && apk info -v > /opt/oo-api/packages.txt
+COPY api/requirements.lock /opt/oo-api/requirements.lock
+RUN python3 -m pip install --no-cache-dir --require-hashes -r /opt/oo-api/requirements.lock \
+ && python3 -m pip check \
+ && python3 -m pip uninstall -y pip
 COPY api/ /opt/oo-api/
 RUN chmod -R a+rX /opt/oo-api && mkdir /dkim && chown 5000:5000 /dkim
 WORKDIR /opt/oo-api

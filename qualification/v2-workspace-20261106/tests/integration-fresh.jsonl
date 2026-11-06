@@ -1,0 +1,28 @@
+{"passed": true, "seconds": 0.03, "test": "OO SQL account creation and alias records"}
+{"passed": true, "seconds": 0.09, "test": "Private API authentication/version response"}
+{"passed": true, "seconds": 0.04, "test": "OO mailbox SQL and API field compatibility"}
+{"passed": true, "seconds": 0.0, "test": "All fields referenced by OO source tables exist"}
+{"passed": true, "seconds": 0.39, "test": "Legacy password login upgrades to Argon2id"}
+{"passed": true, "seconds": 0.16, "test": "Fresh mailbox exposes Inbox and default subscriptions to OO"}
+{"passed": true, "seconds": 7.84, "test": "Wrong passwords and disabled accounts rejected"}
+{"passed": true, "seconds": 8.64, "test": "Authenticated SMTP to IMAP with binary attachment"}
+{"passed": true, "seconds": 0.25, "test": "Inbound SMTP to local mailbox"}
+{"passed": true, "seconds": 1.33, "test": "Alias and group multi-recipient delivery"}
+{"passed": true, "seconds": 0.02, "test": "Open relay blocked and TLS enforced"}
+{"passed": true, "seconds": 0.24, "test": "OO SQL password change remains compatible"}
+{"passed": true, "seconds": 0.24, "test": "Custom folder, draft, subscription and flags"}
+{"passed": true, "seconds": 0.51, "test": "OO cleanup API retains byte-identical messages"}
+{"passed": true, "seconds": 4.37, "test": "Spam training origin validation and SSRF prevention"}
+{"passed": true, "seconds": 4.5, "test": "OO DKIM records produce verifiable outgoing signatures"}
+{"passed": true, "seconds": 4.5, "test": "OO noncanonical base64 RSA keys sign without changing SQL identity"}
+{"passed": true, "seconds": 0.42, "test": "GTUBE spam and EICAR antivirus rejection"}
+{"passed": true, "seconds": 0.18, "test": "API token creation and revocation"}
+{"passed": true, "seconds": 0.94, "test": "IMAP STARTTLS, POP3S and SMTP 465 delivery"}
+{"passed": true, "seconds": 0.18, "test": "Authenticated sender ownership enforcement"}
+{"passed": true, "seconds": 6.0, "test": "Forged From rejected and delegated aliases signed on 587 and 465"}
+{"passed": true, "seconds": 0.2, "test": "Mailbox quota enforcement"}
+{"passed": true, "seconds": 1.89, "test": "Expired identities and delivery-only controls remain enforced"}
+{"passed": true, "seconds": 0.66, "test": "ManageSieve TLS authentication and filter delivery"}
+{"passed": true, "seconds": 0.0, "test": "Runtime has no default outbound route"}
+{"passed": true, "seconds": 0.45, "test": "Record message hash and UID state for restart trial"}
+{"summary": {"passed": 27, "total": 27}, "tests": [{"passed": true, "seconds": 0.03, "test": "OO SQL account creation and alias records"}, {"passed": true, "seconds": 0.09, "test": "Private API authentication/version response"}, {"passed": true, "seconds": 0.04, "test": "OO mailbox SQL and API field compatibility"}, {"passed": true, "seconds": 0.0, "test": "All fields referenced by OO source tables exist"}, {"passed": true, "seconds": 0.39, "test": "Legacy password login upgrades to Argon2id"}, {"passed": true, "seconds": 0.16, "test": "Fresh mailbox exposes Inbox and default subscriptions to OO"}, {"passed": true, "seconds": 7.84, "test": "Wrong passwords and disabled accounts rejected"}, {"passed": true, "seconds": 8.64, "test": "Authenticated SMTP to IMAP with binary attachment"}, {"passed": true, "seconds": 0.25, "test": "Inbound SMTP to local mailbox"}, {"passed": true, "seconds": 1.33, "test": "Alias and group multi-recipient delivery"}, {"passed": true, "seconds": 0.02, "test": "Open relay blocked and TLS enforced"}, {"passed": true, "seconds": 0.24, "test": "OO SQL password change remains compatible"}, {"passed": true, "seconds": 0.24, "test": "Custom folder, draft, subscription and flags"}, {"passed": true, "seconds": 0.51, "test": "OO cleanup API retains byte-identical messages"}, {"passed": true, "seconds": 4.37, "test": "Spam training origin validation and SSRF prevention"}, {"passed": true, "seconds": 4.5, "test": "OO DKIM records produce verifiable outgoing signatures"}, {"passed": true, "seconds": 4.5, "test": "OO noncanonical base64 RSA keys sign without changing SQL identity"}, {"passed": true, "seconds": 0.42, "test": "GTUBE spam and EICAR antivirus rejection"}, {"passed": true, "seconds": 0.18, "test": "API token creation and revocation"}, {"passed": true, "seconds": 0.94, "test": "IMAP STARTTLS, POP3S and SMTP 465 delivery"}, {"passed": true, "seconds": 0.18, "test": "Authenticated sender ownership enforcement"}, {"passed": true, "seconds": 6.0, "test": "Forged From rejected and delegated aliases signed on 587 and 465"}, {"passed": true, "seconds": 0.2, "test": "Mailbox quota enforcement"}, {"passed": true, "seconds": 1.89, "test": "Expired identities and delivery-only controls remain enforced"}, {"passed": true, "seconds": 0.66, "test": "ManageSieve TLS authentication and filter delivery"}, {"passed": true, "seconds": 0.0, "test": "Runtime has no default outbound route"}, {"passed": true, "seconds": 0.45, "test": "Record message hash and UID state for restart trial"}]}

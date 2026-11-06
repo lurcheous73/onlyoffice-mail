@@ -1,0 +1,34 @@
+test_archive_ddl_is_data_and_identifiers_cannot_inject_sql (test_backend_records.BackendRecords) ... ok
+test_lossless_sql_scalars_including_binary_and_microseconds (test_backend_records.BackendRecords) ... ok
+test_tampered_record_and_missing_row_are_detected (test_backend_records.BackendRecords) ... ok
+test_unsafe_storage_and_unsupported_policies_are_rejected (test_backend_records.BackendRecords) ... ok
+test_archive_root_metadata_is_preserved (test_backup_bundle.MigrationTests) ... ok
+test_corruption_fails_before_any_target_write (test_backup_bundle.MigrationTests) ... ok
+test_duplicate_and_file_parent_conflict (test_backup_bundle.MigrationTests) ... ok
+test_links_and_devices_rejected (test_backup_bundle.MigrationTests) ... ok
+test_missing_artifact_refused (test_backup_bundle.MigrationTests) ... ok
+test_missing_mail_key_refused (test_backup_bundle.MigrationTests) ... ok
+test_no_overwrites (test_backup_bundle.MigrationTests) ... ok
+test_parent_traversal_absolute_and_backslash_rejected (test_backup_bundle.MigrationTests) ... ok
+test_readonly_verification_has_no_output_files (test_backup_bundle.MigrationTests) ... ok
+test_success_preserves_content_and_receipt (test_backup_bundle.MigrationTests) ... ok
+test_unmarked_or_linked_destination_refused (test_backup_bundle.MigrationTests) ... ok
+test_unsupported_version_refused (test_backup_bundle.MigrationTests) ... ok
+test_nonminimal_lengths_and_unsigned_integers_become_der (test_dkim_keys.OOKeys) ... ok
+test_truncation_extra_fields_and_indefinite_lengths_are_refused (test_dkim_keys.OOKeys) ... ok
+test_wrong_version_and_oversize_are_refused (test_dkim_keys.OOKeys) ... ok
+test_exact_copy_and_internal_sieve_link (test_file_audit.FileAudit) ... ok
+test_external_link_is_refused_and_manifest_stays_incomplete (test_file_audit.FileAudit) ... ok
+test_filename_flags_and_missing_empty_directory_detected (test_file_audit.FileAudit) ... ok
+test_legacy_rspamd_endpoint_is_explicit_and_does_not_hide_state (test_file_audit.FileAudit) ... ok
+test_linked_root_and_special_file_refused (test_file_audit.FileAudit) ... ok
+test_mail_content_corruption_detected_even_same_length (test_file_audit.FileAudit) ... ok
+test_only_named_postfix_sockets_can_be_recorded_as_transient (test_file_audit.FileAudit) ... ok
+test_overwrite_and_manifest_inside_tree_refused (test_file_audit.FileAudit) ... ok
+test_socket_exception_does_not_hide_unknown_sockets_or_queue_files (test_file_audit.FileAudit) ... ok
+test_timestamp_and_ownership_translation_are_explicit (test_file_audit.FileAudit) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.092s
+
+OK

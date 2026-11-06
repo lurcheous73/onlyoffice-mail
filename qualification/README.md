@@ -1,55 +1,62 @@
-# Recorded lab qualification — 6 November 2026
+# Recorded qualification — 6 November 2026
 
-**Working development candidate; production release gates remain open.** Evidence here contains synthetic tests and build metadata. It contains no production mail, account credentials, private site configuration or copied Workspace data.
+**Development candidate; production release gates remain open.** The current evidence is in [v2-workspace-20261106/](v2-workspace-20261106/). Root-level reports/results retain the earlier `cf9a543` baseline and its original findings; they are not the latest runtime. No production mail, credentials, private signing keys or copied Workspace history is included.
 
-| Check | Result |
+| Check | Recorded result |
 | --- | --- |
-| Existing synthetic mail lab, final runtime images | 23/23 integration cases passed |
-| Fresh installation with final images and empty independent data volumes | 23/23 integration cases passed |
-| Restart, message SHA-256 and IMAP UIDVALIDITY | Passed |
-| Antivirus outage, retryable SMTP response | Passed |
-| Unexpected existing database volume rejected before content/ownership changes | Passed |
-| Offline backup/file preservation tests | 19/19 passed on macOS and Linux |
-| Actual restored ONLYOFFICE browser trial | Pending |
-| Complete private-data migration and reconciliation | Pending |
-| Reviewed vulnerability/configuration/code assessment | Pending |
-| Approved production cutover or live external delivery | Not performed |
+| Final updated runtime on a full restored copy of the v1 candidate | 27/27 integration cases passed |
+| Fresh installation with final images and independent empty data volumes | 27/27 passed |
+| Restart of restored/upgraded candidate; message bytes and IMAP UIDVALIDITY | Passed |
+| Antivirus outage produces retryable SMTP failure | Passed on preceding v2 runtime; no scanner-path change in subsequent Inbox/key-format fixes |
+| Unexpected/unmarked data volume | Refused before ownership/content changes |
+| Offline preservation/archive/key-format checks | 29/29 passed on macOS and Linux |
+| Full stopped candidate backup/restore | Seven volumes reconciled exactly; restored runtime passed continuity check |
+| Schema v1 copied-volume upgrade | Implicit upgrade refused; locked SQL backup verified; rows unchanged; all 19 tables InnoDB; source unchanged |
+| Frozen MySQL 8.4 legacy import fixture | All 52 tables archived, including 18 MyISAM; 48 noncore tables explicitly retained; seven mailbox trees matched |
+| Imported protocol state | Seven accounts, original message bytes, UID1/UIDVALIDITY, Seen, Archive and disabled state verified; active legacy hashes upgraded |
+| Real fresh CommunityServer 12.8 browser | Domain/mailbox/password/sender/alias/group actions, draft, SMTP send, IMAP receive and exact attachment downloads passed |
+| Actual OO-generated signing key | Group-delivered message signature verified against OO's original public key |
+| Full restored private Workspace and complete data reconciliation | Pending |
+| Browser spam-training/notification and complete feature parity | Pending; synthetic API training passes, but no browser-generated training task was observed |
+| Complete source audit of the new migration/fixture code | Pending; completed baseline audit found one signing issue, now fixed/regression tested |
+| Production cutover, DNS changes or real external delivery | Not performed |
 
-The final fresh suite includes OO column/SQL patterns, API authentication/version/retirement, weak-hash login upgrade, disabled/wrong-password rejection, SMTP 587 and 465, local inbound SMTP 25, IMAP 993/STARTTLS, POP3S, aliases/groups, attachments/UTF-8, relay and sender restrictions, quotas, ManageSieve delivery, verified DKIM, spam/antivirus rejection, token revocation, repeated training and network isolation. SMTP destinations are synthetic `.invalid` addresses inside the lab. This does not demonstrate public DNS, sender reputation or real external delivery.
+The 27-case suite includes direct OO SQL/column patterns, private API authentication/version/retirement, password hash transition, SMTP 587/465/25, IMAP 993/STARTTLS, POP3S, default subscriptions, aliases/groups, binary attachments and Unicode, relay/sender restrictions, expiry and delivery-only flags, quotas, Sieve, DKIM PEM and actual OO-style RSA encoding, forged-From rejection, legitimate cross-domain aliases, spam/antivirus filtering, token revocation, repeated training, runtime isolation and restart evidence.
 
-`results.json` records the two full runs, recovery tests and data-volume refusal. `offline-tests.txt` records the independent preservation tests. These are test evidence, not proof that any real backup is complete or restorable.
+## Evidence and runtime versions
 
-## Versions actually exercised
+`v2-workspace-20261106/tests/` contains JSON records extracted from the synthetic run logs, including the real-client group-delivery/signature result. Full private backup bundles, SQLite row/file archives, SQL backups, credentials and failed import attempts remain outside this repository. Checksums of synthetic archives are evidence identifiers, not proof about any private recovery point.
 
-| Component | Recorded version |
+| Component | Version exercised |
 | --- | --- |
-| Mail/API/filter base | Debian 13.7 packages, digest-pinned Debian 13 base |
-| Postfix | 3.10.13 |
-| Dovecot | 2.4.1-4 |
-| MariaDB | 11.8.9, upstream Ubuntu 24.04 image |
-| Loaded MariaDB Connector/C | 3.4.10 |
-| Rspamd | 3.12.1 |
-| ClamAV | 1.5.4, upstream Alpine-based image |
-| Redis | 8.0.2 |
-| Vulnerability scanner | Trivy 0.76.2 |
+| Host/build guest | Debian 13 x86_64; Docker 26.1.5, Compose 2.26.1 |
+| Mail runtime | Debian 13.7 packages; Postfix 3.10.13, Dovecot 2.4.1-4 |
+| Database | MariaDB 11.8.9 upstream Ubuntu image |
+| Native Debian Connector/C | 3.4.10 from hash-verified upstream Debian 13 packages |
+| API/worker | Python 3.14, Alpine 3.23, hashed wheel dependencies |
+| Filter | Rspamd 4.0.1, Alpine 3.24 |
+| Redis | Upstream 8.4.6 Alpine |
+| Antivirus | ClamAV 1.5.4 upstream Alpine image |
+| Client trial | CommunityServer 12.8.0.1971, its Connector/NET 8.4, MySQL 8.4.0 and Elasticsearch 7.16.3 |
+| Scanner | Trivy 0.76.2 |
 
-`build.json` contains the six runtime image IDs, build times, architecture and component output. `packages/` contains complete installed package lists. Local image IDs are recorded because these development images were not pushed to a registry and have no registry digest. The scanner report image IDs were checked against this build record before export.
+The mail lab uses unprivileged service containers inside an outer LXC. The separate fresh Workspace browser fixture uses a dedicated KVM VM with 8 GB RAM; the legacy client container is privileged. See [WORKSPACE-TEST.md](../docs/WORKSPACE-TEST.md) for that boundary and reproduction procedure. No production mounts or published host mail ports were used.
 
-Runtime qualification used a dedicated Debian 13 x86_64 guest with Docker 26.1.5 and Compose 2.26.1. The outer build guest was an LXC; individual mail-service containers were not privileged. No production volumes or published host mail ports were used. `tools/record_build.py` can record a new set of local candidate image IDs, versions and package lists without mounting mail or credentials.
+`build.json` records six runtime image IDs and package versions, and `packages/` retains complete package inventories. Development images have not been published to an image registry. Every scanner report image ID was checked against the build record. The optional legacy Workspace fixture images are outside the six-image mail-runtime scan scope.
 
-## Dependency scan release gate
+## Dependency release gate
 
-These are raw package findings, not counts of exploitable service vulnerabilities. No ignore rules were applied, and no high/critical secret findings remain in these images.
+Raw findings are retained without ignore rules. They are package findings, not a count of exploitable mail-service vulnerabilities.
 
-| Runtime image | High findings | Critical findings | Unique CVEs |
-| --- | ---: | ---: | ---: |
-| Database | 0 | 0 | 0 |
-| Antivirus | 0 | 0 | 0 |
-| Mail | 96 | 4 | 36 |
-| API/worker | 78 | 0 | 27 |
-| Filter | 83 | 1 | 30 |
-| Redis | 50 | 0 | 14 |
+| Image | High | Critical | Unique CVEs | Secret findings |
+| --- | ---: | ---: | ---: | ---: |
+| Database | 0 | 0 | 0 | 0 |
+| Mail | 74 | 0 | 23 | 0 |
+| API/worker | 0 | 0 | 0 | 0 |
+| Filter | 0 | 0 | 0 | 0 |
+| Redis | 0 | 0 | 0 | 0 |
+| Antivirus | 0 | 0 | 0 | 0 |
 
-`scans/` retains the full reports; `security-summary.json` contains counts and their SHA-256 values. `trivy-db-metadata.json` records the scanner database dates. Review [SECURITY.md](../docs/SECURITY.md) for the patched connector/provenance issue, the remaining libxml2 finding and update procedure. The scan exits unsuccessfully by design until the release gate is resolved. The GitHub workflow has been supplied but has not been run on GitHub.
+The earlier baseline had 307 high and five critical package findings. The current scan has zero critical findings, with the mail-image high findings still open. `security-summary.json` binds the counts to report hashes/image IDs; `trivy-db-metadata.json` records the vulnerability database dates. No blanket not-affected classification was applied. The scan exits unsuccessfully while its release gate remains open. The supplied GitHub workflow has not been run on GitHub.
 
-Production promotion requires independently clearing dependency/code/configuration review, actual OO client/administration parity, complete copied-data reconciliation, backup recovery and rollback preservation. No script in this package grants approval for a live change.
+Promotion requires remaining security/source review, full actual-client parity, complete private-data/file reconciliation, same-version recovery, a current coordinated capture and a rollback plan preserving all trial writes. No test or script grants approval for a live change.

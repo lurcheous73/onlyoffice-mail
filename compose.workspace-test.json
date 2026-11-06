@@ -1,0 +1,153 @@
+{
+  "services": {
+    "workspace-db": {
+      "networks": [
+        "private"
+      ],
+      "restart": "no",
+      "image": "mysql:8.4.0@sha256:dab7049abafe3a0e12cbe5e49050cf149881c0cd9665c289e5808b9dad39c9e0",
+      "command": [
+        "--mysql-native-password=ON",
+        "--sql-mode=NO_ENGINE_SUBSTITUTION",
+        "--max-connections=150"
+      ],
+      "environment": {
+        "MYSQL_ROOT_PASSWORD_FILE": "/run/secrets/workspace_root",
+        "MYSQL_ROOT_HOST": "%"
+      },
+      "secrets": [
+        "workspace_root",
+        "workspace_app"
+      ],
+      "volumes": [
+        "workspace_db:/var/lib/mysql",
+        "./workspace-test/init-db.sh:/docker-entrypoint-initdb.d/10-lab-users.sh:ro"
+      ],
+      "mem_limit": "768m",
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "MYSQL_PWD=$$(cat /run/secrets/workspace_root) mysql -uroot -Nse \"SELECT 1\" >/dev/null 2>&1"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 40,
+        "start_period": "30s"
+      }
+    },
+    "workspace-search": {
+      "networks": [
+        "private"
+      ],
+      "restart": "no",
+      "image": "onlyoffice/elasticsearch:7.16.3@sha256:f09d622776b02012dbc8d63493e9bafac29cd03c2716f364262c15e3622ceda1",
+      "environment": {
+        "discovery.type": "single-node",
+        "ES_JAVA_OPTS": "-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true",
+        "ingest.geoip.downloader.enabled": "false"
+      },
+      "volumes": [
+        "workspace_search:/usr/share/elasticsearch/data"
+      ],
+      "mem_limit": "1536m",
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "curl --fail --silent 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null"
+        ],
+        "interval": "10s",
+        "timeout": "10s",
+        "retries": 40
+      },
+      "memswap_limit": "2g"
+    },
+    "workspace": {
+      "networks": {
+        "private": {
+          "aliases": [
+            "workspace.lab.invalid"
+          ]
+        }
+      },
+      "restart": "no",
+      "build": {
+        "context": ".",
+        "dockerfile": "workspace-test/Dockerfile"
+      },
+      "image": "oo-mailserver-workspace-fixture:dev",
+      "hostname": "workspace.lab.invalid",
+      "environment": {
+        "MYSQL_SERVER_HOST": "workspace-db",
+        "MYSQL_SERVER_DB_NAME": "onlyoffice",
+        "MYSQL_SERVER_USER": "onlyoffice_user",
+        "ELASTICSEARCH_SERVER_HOST": "workspace-search",
+        "ELASTICSEARCH_SERVER_HTTPPORT": "9200",
+        "SERVER_HOST": "workspace.lab.invalid"
+      },
+      "secrets": [
+        "workspace_app",
+        "workspace_machinekey"
+      ],
+      "privileged": true,
+      "cgroup": "host",
+      "volumes": [
+        "workspace_data:/var/www/onlyoffice/Data",
+        "workspace_logs:/var/log/onlyoffice",
+        "/sys/fs/cgroup:/sys/fs/cgroup",
+        "./.state/tls/ca.crt:/run/tls/lab-ca.crt:ro"
+      ],
+      "mem_limit": "4g",
+      "depends_on": {
+        "workspace-db": {
+          "condition": "service_healthy"
+        },
+        "workspace-search": {
+          "condition": "service_healthy"
+        },
+        "mail": {
+          "condition": "service_healthy"
+        }
+      },
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; data=urllib.request.urlopen('http://127.0.0.1/auth.aspx',timeout=8).read(); assert b'<title>Please wait' not in data"
+        ],
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 40,
+        "start_period": "180s"
+      },
+      "memswap_limit": "6g"
+    },
+    "api": {
+      "environment": {
+        "TRAINING_ORIGINS": "http://workspace.lab.invalid"
+      }
+    },
+    "worker": {
+      "environment": {
+        "TRAINING_ORIGINS": "http://workspace.lab.invalid"
+      }
+    }
+  },
+  "volumes": {
+    "workspace_db": {},
+    "workspace_search": {},
+    "workspace_data": {},
+    "workspace_logs": {}
+  },
+  "secrets": {
+    "workspace_root": {
+      "file": "./.workspace-test/secrets/workspace_root"
+    },
+    "workspace_app": {
+      "file": "./.workspace-test/secrets/workspace_app"
+    },
+    "workspace_machinekey": {
+      "file": "./.workspace-test/secrets/workspace_machinekey"
+    }
+  }
+}

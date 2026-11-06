@@ -1,5 +1,4 @@
-FROM debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends redis-server && mkdir /data && chown redis:redis /data && apt-get clean
+FROM redis:8.4.6-alpine@sha256:0b0ae6770e7d416846dca4227382538fe4cc7e002e4feb04e4ade5fa851d920c
+RUN apk upgrade --no-cache
 EXPOSE 6379
-USER redis
-CMD ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--appendonly", "yes", "--dir", "/data"]
+CMD ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--appendonly", "yes", "--appenddirname", "appendonlydir", "--appendfilename", "appendonly.aof", "--dir", "/data"]

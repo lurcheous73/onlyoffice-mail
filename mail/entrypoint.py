@@ -8,10 +8,10 @@ hostname=domain(os.environ.get('MAIL_HOSTNAME','mail.lab.invalid'))
 password=secret('reader_db')
 sql=Path('/etc/postfix/sql')
 queries={
- 'domains':"SELECT domain FROM domain WHERE domain='%s' AND active=1 AND backupmx=0",
- 'mailboxes':"SELECT CONCAT(m.storagebasedirectory,'/',m.storagenode,'/',m.maildir,'Maildir/') FROM mailbox m JOIN domain d ON d.domain=m.domain WHERE m.username='%s' AND m.active=1 AND m.enabledeliver=1 AND m.enablelda=1 AND d.active=1",
- 'aliases':"SELECT a.goto FROM alias a JOIN domain d ON d.domain=a.domain WHERE a.address='%s' AND a.active=1 AND d.active=1",
- 'senders':"SELECT username FROM mailbox WHERE username='%s' AND active=1 UNION SELECT goto FROM alias WHERE address='%s' AND active=1",
+ 'domains':"SELECT domain FROM domain WHERE domain='%s' AND active=1 AND backupmx=0 AND expired>UTC_TIMESTAMP()",
+ 'mailboxes':"SELECT CONCAT(m.storagebasedirectory,'/',m.storagenode,'/',m.maildir,'Maildir/') FROM mailbox m JOIN domain d ON d.domain=m.domain WHERE m.username='%s' AND m.active=1 AND m.enabledeliver=1 AND m.enablelda=1 AND m.enablelmtp=1 AND m.expired>UTC_TIMESTAMP() AND d.active=1 AND d.expired>UTC_TIMESTAMP()",
+ 'aliases':"SELECT a.goto FROM alias a JOIN domain d ON d.domain=a.domain WHERE a.address='%s' AND a.active=1 AND a.expired>UTC_TIMESTAMP() AND d.active=1 AND d.expired>UTC_TIMESTAMP() AND (a.address<>a.goto OR EXISTS(SELECT 1 FROM mailbox m WHERE m.username=a.address AND m.active=1 AND m.expired>UTC_TIMESTAMP() AND m.enabledeliver=1 AND m.enablelda=1 AND m.enablelmtp=1))",
+ 'senders':"SELECT m.username FROM mailbox m JOIN domain d ON d.domain=m.domain WHERE m.username='%s' AND m.active=1 AND m.expired>UTC_TIMESTAMP() AND d.active=1 AND d.expired>UTC_TIMESTAMP() UNION SELECT a.goto FROM alias a JOIN domain d ON d.domain=a.domain WHERE a.address='%s' AND a.active=1 AND a.expired>UTC_TIMESTAMP() AND d.active=1 AND d.expired>UTC_TIMESTAMP()",
 }
 for name,query in queries.items():
     p=sql/(name+'.cf')
@@ -20,6 +20,7 @@ for name,query in queries.items():
     import grp
     os.chown(p,0,grp.getgrnam('postfix').gr_gid)
 settings={
+ 'queue_directory':'/var/spool/postfix',
  'myhostname':hostname,'myorigin':'$myhostname','mydestination':'localhost',
  'inet_interfaces':'all','inet_protocols':'ipv4','mynetworks':'127.0.0.0/8',
  'compatibility_level':'3.10','maillog_file':'/dev/stdout',

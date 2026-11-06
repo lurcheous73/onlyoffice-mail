@@ -30,6 +30,24 @@ The portable verifier/unpacker from the companion Workspace project is included 
 
 This is the mapping contract. **A general automatic conversion of all legacy backend tables is not implemented.** Do not feed a MySQL 8 application dump or old database directory directly into MariaDB 11.8. First restore the original engine/version in the isolated recovery clone, export reviewed logical records, then load only into a new target schema with an explicit field map. Keep the whole source database recoverable. MySQL system tables/users, old definers and authentication plugins must not be imported into this candidate.
 
+## Implemented logical import
+
+`migration/backend_records.py` exports a frozen, network-isolated MySQL 8.4 **copy** through a SELECT-only `migration_reader` account at the fixed `legacy-copy` alias. It requires read-only and super-read-only modes with scheduled events disabled. It archives every base table's DDL, columns and typed rows in private SQLite, including binary values, decimals, zero dates and microsecond timestamps. Source SQL DDL is data; it is never executed on the target.
+
+The `inventory` action produces a review policy. Each noncore table needs an explicit `archive_only` decision bound to its row count and digest; used unsupported feature tables are refused. The `plan` action checks identities, supported policies/hash families, exact copied file manifests and real mailbox directories. It refuses unknown columns, missing accounts or a populated target. The `apply` action requires the reviewed plan digest, writes the four core tables in one transaction, rejects conversion warnings and compares every imported row before commit. A private receipt records the outcome. A repeat import is refused. The other tables remain losslessly recoverable in the original database and archive; this does not implement their historical features.
+
+Run `python3 migration/backend_records.py --help` in the prepared migration image for the actions and required paths. Keep all archives, policies, plans and file manifests private. The source and target must have no default IPv4/IPv6 route. Mount the copied mail tree read-only while planning/importing. Never use this tool to freeze or capture live databases.
+
+`tools/rehearse_legacy_import.py` demonstrates the procedure using a newly generated 52-table MySQL 8.4 fixture with 18 MyISAM tables, seven accounts, two domains and retained UID/Sieve state. This is synthetic evidence; it does not establish real-data completeness.
+
+## Candidate recovery and schema upgrades
+
+All 19 current candidate tables use InnoDB. Schema v1 accidentally retained two MyISAM training tables. A v1 volume is refused before ownership or contents change unless `OO_UPGRADE_RESTORED_COPY=yes` is explicitly set on an independent restored copy. The upgrade first retains a locked full SQL backup and SHA-256 receipt inside the copied volume, converts the two tables and then writes the v2 marker. Existing v1 markers and backup files remain. Never enable this flag on the original volume.
+
+`tools/rehearse_schema_upgrade.py` proves the refusal, backed-up conversion, exact logical row preservation, restart idempotence and unchanged original source. `tools/rehearse_backup.py` backs up an already stopped synthetic candidate and restores seven volumes plus private configuration into new names. It records all file bytes, paths, safe links, ownership, modes and nanosecond modification times, pins the saved image IDs and refuses existing destinations. It does not stop a service or grant permission to operate on production. Private backup bundles contain credentials and signing keys.
+
+The file verifier remains strict by default. The synthetic backup harness may explicitly record and exclude named Postfix Unix sockets and the historical Rspamd Unix socket; they contain no message payload. Unknown sockets and special entries are refused. Ordinary files with those names are still hashed. No queue message or Maildir file is excluded by these exceptions.
+
 ## Rehearsal order
 
 1. Restore the complete original backup to an independent isolated machine. Remove inherited live networks, mounts, jobs and callbacks before booting it. Preserve the original backup and the failed attempts.

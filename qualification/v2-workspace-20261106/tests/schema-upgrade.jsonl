@@ -1,0 +1,1 @@
+{"all_tables_innodb": true, "implicit_upgrade_refused_before_mutation": true, "logical_rows_sha256": "a3aa22b0467204bcbec1516c00bf618e06186a47f33aa23f9a33bb98b75a068c", "passed": true, "pre_upgrade_locked_sql_backup_verified": true, "restart_idempotent": true, "source_unchanged": true, "test": "Schema v1 copy upgrade preserves records and original source"}

@@ -16,6 +16,10 @@ CommunityServer source and binaries are not included in this package.
 Images contain separately licensed Debian, MariaDB, Postfix, Dovecot, Rspamd,
 Redis, ClamAV, Python and library packages. Preserve their notices and satisfy
 their source-distribution requirements before publishing binary images. The
-MariaDB client library is copied with its copyright notice and provenance.
+MariaDB client library is installed from hash-verified native Debian packages,
+with its package copyright and provenance retained. The optional synthetic
+Workspace fixture downloads pinned upstream images; no CommunityServer binary
+is redistributed in this source package. Its narrowly patched bootstrap is
+for the isolated legacy client fixture only.
 The package is currently a source candidate; binary redistribution has not
 received a complete licence review.

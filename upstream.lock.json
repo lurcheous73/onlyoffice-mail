@@ -15,7 +15,10 @@
   "base_images": {
     "debian": "debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2",
     "mariadb": "mariadb:11.8.9@sha256:c4124d1afa875e47f2892edf26b482fa54f796e2f342d3717a04ca091a22a9bd",
-    "clamav": "clamav/clamav:1.5.4_base@sha256:58168cd4f48a118c7d20b76da8ffce97e579b84ed7e6d1e977c6e22b1e989c5a"
+    "clamav": "clamav/clamav:1.5.4_base@sha256:58168cd4f48a118c7d20b76da8ffce97e579b84ed7e6d1e977c6e22b1e989c5a",
+    "python_api": "python:3.14-alpine3.23@sha256:0cdfadc8472de8f74a5d3c6e5e49d1b3f059f36cd01a0a0d4015cb1cb89df436",
+    "filter": "alpine:3.24@sha256:3f4d6b32e26703c6082839234f43769d5046b3ac7c910033911d1e71d8cd630a",
+    "redis": "redis:8.4.6-alpine@sha256:0b0ae6770e7d416846dca4227382538fe4cc7e002e4feb04e4ade5fa851d920c"
   },
   "scanner": "Trivy 0.76.2; high/critical reports retained without suppression"
 }

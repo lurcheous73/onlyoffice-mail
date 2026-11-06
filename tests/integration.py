@@ -239,6 +239,25 @@ def test_dkim():
     assert message['DKIM-Signature'],'DKIM header missing'
     assert dkim.verify(message.raw_source,dnsfunc=lambda name,timeout=5:b'v=DKIM1; k=rsa; p='+public),'DKIM verification failed'
 
+def test_oo_dkim_encoding():
+    # Reproduce OO CryptoUtil's long-form lengths and unsigned RSA integers.
+    key=rsa.generate_private_key(public_exponent=65537,key_size=1024)
+    n=key.private_numbers()
+    def legacy_tlv(tag,value):
+        raw=value.to_bytes(max(1,(value.bit_length()+7)//8),'big') if isinstance(value,int) else value
+        size=len(raw);length=b'\x81'+bytes([size]) if size<=255 else b'\x82'+size.to_bytes(2,'big')
+        return bytes([tag])+length+raw
+    values=(0,n.public_numbers.n,n.public_numbers.e,n.d,n.p,n.q,n.dmp1,n.dmq1,n.iqmp)
+    encoded=base64.b64encode(legacy_tlv(48,b''.join(legacy_tlv(2,v) for v in values))).decode()
+    public=base64.b64encode(key.public_key().public_bytes(serialization.Encoding.DER,serialization.PublicFormat.SubjectPublicKeyInfo))
+    sql('UPDATE dkim SET private_key=%s,public_key=%s WHERE domain_name=%s',(encoded,public.decode(),HOST))
+    time.sleep(4)
+    tag=RUN+'-oo-dkim';send(ALICE,BOB,tag)
+    _,message=find_message(BOB,tag)
+    assert message['DKIM-Signature'],'OO key was not published'
+    assert dkim.verify(message.raw_source,dnsfunc=lambda name,timeout=5:b'v=DKIM1; k=rsa; p='+public),'OO-format key signature failed'
+    assert sql('SELECT private_key FROM dkim WHERE domain_name=%s',(HOST,))[0]['private_key']==encoded,'Original SQL key was rewritten'
+
 def test_spam_and_antivirus():
     patterns=[('GTUBE','XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X'),
               ('EICAR','X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*')]
@@ -286,6 +305,40 @@ def test_sender_ownership():
         except (smtplib.SMTPSenderRefused,smtplib.SMTPRecipientsRefused):pass
         else:raise AssertionError('Unowned sender accepted')
 
+def test_header_signing_authorization():
+    other='beta.invalid'
+    sql('INSERT INTO domain(domain,description,created,modified,active) VALUES(%s,%s,NOW(),NOW(),1) ON DUPLICATE KEY UPDATE active=1',(other,'Synthetic second domain'))
+    key=rsa.generate_private_key(public_exponent=65537,key_size=2048)
+    private=key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.TraditionalOpenSSL,serialization.NoEncryption()).decode()
+    public=base64.b64encode(key.public_key().public_bytes(serialization.Encoding.DER,serialization.PublicFormat.SubjectPublicKeyInfo))
+    sql('INSERT INTO dkim(domain_name,selector,private_key,public_key) VALUES(%s,%s,%s,%s)',(other,'delegated'+RUN,private,public.decode()))
+    delegated='delegated'+RUN+'@'+other
+    sql('REPLACE INTO alias(address,goto,domain,created,modified,active,islist) VALUES(%s,%s,%s,NOW(),NOW(),1,0)',(delegated,ALICE,other))
+    time.sleep(4)
+    for port in (587,465):
+        def client():
+            if port==465:return smtplib.SMTP_SSL('mail.lab.invalid',465,context=CONTEXT,timeout=40)
+            c=smtplib.SMTP('mail.lab.invalid',587,timeout=40)
+            c.ehlo();c.starttls(context=CONTEXT);c.ehlo();return c
+        for forged in ('executive@'+other,'not-owned@'+HOST):
+            message=EmailMessage();message['From']=forged;message['To']=BOB
+            message['Subject']='Synthetic header forgery';message.set_content('An owned envelope must not authorize a different header identity.')
+            with client() as c:
+                c.login(ALICE,PASS)
+                try:c.send_message(message,from_addr=ALICE,to_addrs=[BOB])
+                except smtplib.SMTPDataError as exc:assert 500<=exc.smtp_code<600,exc.smtp_code
+                else:raise AssertionError('Forged MIME From accepted on '+str(port))
+        # A cross-domain alias is explicitly delegated in SQL. Matching that
+        # alias in header and envelope must retain legitimate OO send-as.
+        tag=RUN+'-delegated-'+str(port)
+        message=EmailMessage();message['From']=delegated;message['To']=BOB
+        message['Message-ID']='<'+tag+'@alpha.invalid>';message['Subject']='Delegated alias';message.set_content('Synthetic authorized alias submission.')
+        with client() as c:
+            c.login(ALICE,PASS);c.send_message(message,from_addr=delegated,to_addrs=[BOB])
+        _,received=find_message(BOB,tag)
+        assert received['DKIM-Signature'] and 'd='+other in str(received['DKIM-Signature'])
+        assert dkim.verify(received.raw_source,dnsfunc=lambda name,timeout=5:b'v=DKIM1; k=rsa; p='+public)
+
 def test_quota():
     sql('UPDATE mailbox SET quota=1 WHERE username=%s',(BOB,))
     try:
@@ -293,6 +346,28 @@ def test_quota():
             code,data=c.append('INBOX',None,None,b'Subject: Quota test\r\n\r\n'+b'a'*(1200*1024))
             assert code=='NO',(code,data)
     finally:sql('UPDATE mailbox SET quota=0 WHERE username=%s',(BOB,))
+
+def test_expiry_and_delivery_controls():
+    def rejected_recipient(recipient):
+        with smtplib.SMTP('mail.lab.invalid',25,timeout=10) as c:
+            c.ehlo();c.mail('external@sender.invalid');code,_=c.rcpt(recipient)
+            assert 500<=code<600,(recipient,code)
+    sql("UPDATE mailbox SET expired='2020-01-01' WHERE username=%s",(BOB,))
+    try:
+        try:
+            with imap(BOB):pass
+        except imaplib.IMAP4.error:pass
+        else:raise AssertionError('Expired mailbox login accepted')
+        rejected_recipient(BOB)
+    finally:sql("UPDATE mailbox SET expired='9999-12-31' WHERE username=%s",(BOB,))
+    alias='expired'+RUN+'@'+HOST
+    sql("INSERT INTO alias(address,goto,domain,active,expired) VALUES(%s,%s,%s,1,'2020-01-01')",(alias,ALICE,HOST))
+    rejected_recipient(alias)
+    sql('UPDATE mailbox SET enabledeliver=0 WHERE username=%s',(BOB,))
+    try:
+        with imap(BOB) as c:assert c.noop()[0]=='OK','Delivery control incorrectly disabled mailbox reading'
+        rejected_recipient(BOB)
+    finally:sql('UPDATE mailbox SET enabledeliver=1 WHERE username=%s',(BOB,))
 
 def test_sieve():
     s=socket.create_connection(('mail.lab.invalid',4190),10);f=s.makefile('rb')
@@ -346,6 +421,16 @@ def test_network_boundary():
     routes=Path('/proc/net/route').read_text().splitlines()[1:]
     assert not any(line.split()[1]=='00000000' for line in routes),'Unexpected default route'
 
+def test_default_subscriptions():
+    # OO's ImapSync builds its working-folder map from subscribed folders.
+    # A selectable but unsubscribed Inbox delivers mail without displaying it.
+    with imap(ALICE) as client:
+        code,folders=client.lsub()
+        assert code=='OK',(code,folders)
+        for name in ('INBOX','Sent','Drafts','Trash','Junk'):
+            suffixes=(b' '+name.encode(),b' "'+name.encode()+b'"')
+            assert any(line and line.endswith(suffixes) for line in folders),(name,folders)
+
 if __name__=='__main__':
     server=HTTPServer(('0.0.0.0',8080),FixtureHandler)
     threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -355,6 +440,7 @@ if __name__=='__main__':
       ('OO mailbox SQL and API field compatibility',test_sql_api),
       ('All fields referenced by OO source tables exist',test_all_oo_fields),
       ('Legacy password login upgrades to Argon2id',test_password_upgrade),
+      ('Fresh mailbox exposes Inbox and default subscriptions to OO',test_default_subscriptions),
       ('Wrong passwords and disabled accounts rejected',test_wrong_and_disabled),
       ('Authenticated SMTP to IMAP with binary attachment',test_authenticated_delivery),
       ('Inbound SMTP to local mailbox',test_inbound_delivery),
@@ -365,11 +451,14 @@ if __name__=='__main__':
       ('OO cleanup API retains byte-identical messages',test_cleanup_preserves_mail),
       ('Spam training origin validation and SSRF prevention',test_training_ssrf_rejected),
       ('OO DKIM records produce verifiable outgoing signatures',test_dkim),
+      ('OO noncanonical base64 RSA keys sign without changing SQL identity',test_oo_dkim_encoding),
       ('GTUBE spam and EICAR antivirus rejection',test_spam_and_antivirus),
       ('API token creation and revocation',test_api_key_lifecycle),
       ('IMAP STARTTLS, POP3S and SMTP 465 delivery',test_starttls_and_pop3),
       ('Authenticated sender ownership enforcement',test_sender_ownership),
+      ('Forged From rejected and delegated aliases signed on 587 and 465',test_header_signing_authorization),
       ('Mailbox quota enforcement',test_quota),
+      ('Expired identities and delivery-only controls remain enforced',test_expiry_and_delivery_controls),
       ('ManageSieve TLS authentication and filter delivery',test_sieve),
       ('Runtime has no default outbound route',test_network_boundary),
       ('Record message hash and UID state for restart trial',record_persistence),

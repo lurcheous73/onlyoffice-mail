@@ -1,0 +1,82 @@
+{
+  "recorded_at": "2026-11-06T14:24:42.115053+00:00",
+  "images": {
+    "database": {
+      "Id": "sha256:da7bde99d67a19e29f1c28bca4d853afb00fbfd47986a6527e8c4fefca466b55",
+      "RepoDigests": [],
+      "Created": "2026-11-06T12:19:56.535667944Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-database:dev"
+    },
+    "mail": {
+      "Id": "sha256:6f8e8fba08a0441d75de41daa5596149b45524fade484433d81a4e311e3c68b2",
+      "RepoDigests": [],
+      "Created": "2026-11-06T14:15:00.218473877Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-mail:dev"
+    },
+    "api": {
+      "Id": "sha256:bb4576507c618ed444d00e160d6d7951ab17777bf43f3419b637da0f87582ae0",
+      "RepoDigests": [],
+      "Created": "2026-11-06T14:20:26.337856095Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-api:dev"
+    },
+    "filter": {
+      "Id": "sha256:4b9c45ab006241f86bf61966acbac009952ecb93fc147b46d1d8f203805b4951",
+      "RepoDigests": [],
+      "Created": "2026-11-06T12:20:03.537736296Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-filter:dev"
+    },
+    "antivirus": {
+      "Id": "sha256:f82a37f8028261fd74bc2ed8f7601fa25725e2ae5a043fcd900f7809a62569f1",
+      "RepoDigests": [],
+      "Created": "2026-11-06T09:23:17.738673035Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-antivirus:dev"
+    },
+    "redis": {
+      "Id": "sha256:a9d79d57f1ab997dcb93a8c0e0505520d98c0ea3ff20f0b41f214dda21a67ca8",
+      "RepoDigests": [],
+      "Created": "2026-11-06T12:19:58.410413199Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-redis:dev"
+    }
+  },
+  "components": {
+    "postfix": "3.10.13",
+    "dovecot": "2.4.1-4 (7d8c0e5759)",
+    "mariadb": "mariadbd  Ver 11.8.9-MariaDB-ubu2404 for debian-linux-gnu on x86_64 (mariadb.org binary distribution)",
+    "rspamd": "Rspamd daemon version 4.0.1\n\nCPU architecture x86_64; features: avx2, avx, sse2, sse3, ssse3, sse4.1, sse4.2, rdrand\nHyperscan enabled: TRUE\nJemalloc enabled: FALSE\nLuaJIT enabled: TRUE (LuaJIT version: LuaJIT 2.1.1761786044)\nASAN enabled: FALSE\nBLAS enabled: FALSE\nFasttext enabled: TRUE (built-in)",
+    "clamav": "ClamAV 1.5.4",
+    "redis": "Redis server v=8.4.6 sha=00000000:1 malloc=jemalloc-5.3.0 bits=64 build=48e281cf36fe1bf3",
+    "loaded_connector_provenance": {
+      "source": "MariaDB Community 11.8.9 native Debian 13 packages",
+      "platform": "debian:13 amd64",
+      "metadata": "https://mirror.mariadb.org/repo/11.8/debian/dists/trixie/main/binary-amd64/Packages.gz",
+      "packages": [
+        {
+          "name": "mariadb-common",
+          "version": "1:11.8.9+maria~deb13",
+          "url": "https://archive.mariadb.org/mariadb-11.8.9/repo/debian/pool/main/m/mariadb/mariadb-common_11.8.9+maria~deb13_all.deb",
+          "sha256": "40b1f1df61bdd351d89da0bed14a13ac46cf8d3a80c5e69d741a622d8a091b6b"
+        },
+        {
+          "name": "libmariadb3",
+          "version": "1:11.8.9+maria~deb13",
+          "url": "https://archive.mariadb.org/mariadb-11.8.9/repo/debian/pool/main/m/mariadb/libmariadb3_11.8.9+maria~deb13_amd64.deb",
+          "sha256": "0566a944d7fe2a7d042dd76f267ba12334cbdf0ba881a97874e8d24bc044fb0d"
+        }
+      ],
+      "connector_version": "3.4.10"
+    }
+  },
+  "scope": "build metadata only; no mail data or credentials mounted"
+}

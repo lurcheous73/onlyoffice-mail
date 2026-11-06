@@ -1,0 +1,1 @@
+{"attachment_sha256": "ccd4242aacd76b236b9571a55184eab4f914f19996cc1cac141604465061da54", "dkim_verified_against_original_oo_public_key": true, "message_sha256": "d15f00f6302585c57b28759594e49108ab2bac95b1201dc15314a9c43c0ca323", "passed": true, "public_dns_used": false, "test": "Real OO UI group delivery, original OO RSA key signature and exact binary attachment"}

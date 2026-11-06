@@ -2,7 +2,6 @@
 import os
 from pathlib import Path, PurePosixPath
 import re
-import pymysql
 
 DOMAIN = re.compile(r"(?=.{1,253}\Z)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\Z")
 LOCAL = re.compile(r"[a-z0-9][a-z0-9.!#$%&'*+\-=?^_`{|}~]{0,63}\Z")
@@ -28,6 +27,7 @@ def secret(name):
     return value
 
 def connect(user=None, password_name=None):
+    import pymysql
     return pymysql.connect(host=os.environ.get('DB_HOST','database'),
         user=user or os.environ.get('DB_USER','mailapi'),
         password=secret(password_name or os.environ.get('DB_SECRET','api_db')),

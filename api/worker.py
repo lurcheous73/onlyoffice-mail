@@ -4,6 +4,7 @@
 Only preapproved OO HTTP origins can supply messages. Redirects are refused;
 responses are size bounded. Rspamd and Redis stay on the private network.
 """
+import base64
 import hashlib
 import json
 import os
@@ -12,8 +13,10 @@ import re
 import time
 from urllib.parse import urlsplit
 import requests
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.serialization import Encoding,NoEncryption,PrivateFormat,load_der_private_key,load_pem_private_key
 from common import connect,domain,secret
+from dkim_keys import canonical_oo_pkcs1
 from server import validate_training_url
 
 MAX_BYTES=25*1024*1024
@@ -29,7 +32,17 @@ def publish_dkim():
         if not re.fullmatch('[A-Za-z0-9_-]{1,63}',selector):raise ValueError('Invalid DKIM selector')
         key=row['private_key'].encode()
         if len(key)>16384:raise ValueError('Oversize DKIM key')
-        load_pem_private_key(key,password=None)
+        # OO 12.8 CryptoUtil writes base64 PKCS#1 DER. Legacy/imported records
+        # may already contain PEM. Preserve the SQL value and publish a parsed,
+        # canonical PEM copy for Rspamd without rotating the signing identity.
+        if key.startswith(b'-----BEGIN '):parsed=load_pem_private_key(key,password=None)
+        else:
+            raw=base64.b64decode(key,validate=True)
+            try:parsed=load_der_private_key(raw,password=None)
+            except ValueError:parsed=load_der_private_key(canonical_oo_pkcs1(raw),password=None)
+        if not isinstance(parsed,RSAPrivateKey):raise ValueError('Expected an RSA DKIM key')
+        if not 1024<=parsed.key_size<=8192:raise ValueError('Unsupported RSA DKIM key size')
+        key=parsed.private_bytes(Encoding.PEM,PrivateFormat.TraditionalOpenSSL,NoEncryption())
         dest=root/(host+'.'+selector+'.key')
         if not dest.exists() or dest.read_bytes()!=key:
             temp=root/(host+'.'+selector+'.tmp')

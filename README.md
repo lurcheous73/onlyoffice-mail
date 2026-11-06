@@ -2,7 +2,7 @@
 
 An independent replacement candidate for the old ONLYOFFICE MailServer runtime, designed for a Debian 13 Docker host while retaining CommunityServer 12.8's mail integration. The Workspace interface remains in CommunityServer.
 
-**Status: working isolated lab candidate; not approved for live mail.** The recorded suite exercises real SMTP, IMAP, POP3, Sieve, filtering and the OO SQL/API contracts. A complete restored Workspace UI trial, a real-data migration rehearsal and outstanding security findings remain release gates. See [qualification/README.md](qualification/README.md).
+**Status: working isolated lab candidate; not approved for live mail.** Real CommunityServer 12.8 browser testing now covers domain/mailbox creation, password and alias changes, sending, receiving and exact attachment downloads. Synthetic legacy import, full candidate backup/restore and copied-database upgrades have passed. A complete restored Workspace trial, private-data reconciliation and remaining security findings are still release gates. See [qualification/README.md](qualification/README.md).
 
 The current iRedMail 1.8.9 source is a reference for the maintained mail stack. This project implements an OO-compatible schema and configuration rather than running the iRedMail installer. Matching field names alone does not prove compatibility: protocol, administration, persistence and data-reconciliation tests are required.
 
@@ -17,11 +17,11 @@ The current iRedMail 1.8.9 source is a reference for the maintained mail stack. 
 | Filtering | Rspamd, Redis and upstream ClamAV 1.5.4; retryable failure if scanning is unavailable |
 | Qualification | Synthetic SQL/API/protocol tests and recovery checks |
 
-The MariaDB container uses the upstream Ubuntu-based image; mail, API, filter and Redis use Debian 13. Antivirus uses Cisco's upstream Alpine-based image to obtain its newer parsing fixes. The deployment host is Debian 13. Exact source commits and base-image digests are in [upstream.lock.json](upstream.lock.json); recorded package versions are in `qualification/`.
+The MariaDB container uses its upstream Ubuntu-based image. Mail uses Debian 13 with native upstream Debian packages for Connector/C 3.4.10; no fallback library or dynamic-linker override is installed. API/worker, filter and Redis use pinned Alpine bases; antivirus uses Cisco's upstream Alpine-based image. The deployment host is Debian 13. Exact source commits and base-image digests are in [upstream.lock.json](upstream.lock.json); recorded package versions are in `qualification/`.
 
 ## Run a fresh synthetic lab
 
-Use a dedicated disposable Linux VM with Docker Engine, Compose v2, Python 3 and OpenSSL. This build was exercised on Linux x86_64. The copied MariaDB client library currently makes x86_64 the supported build architecture. Allow at least 4 GB RAM for the guest; 6 GB is preferable while building/scanning, plus 20 GB free disk. Mail and application backup space is additional.
+Use a dedicated disposable Linux VM with Docker Engine, Compose v2, Python 3 and OpenSSL. This build was exercised on Linux x86_64. The native client package and hashed Python wheel locks currently support x86_64 builds. Allow at least 4 GB RAM for the guest; 6 GB is preferable while building/scanning, plus 20 GB free disk. Mail and application backup space is additional.
 
 From a fresh checkout:
 
@@ -69,6 +69,8 @@ Always restore the antivirus service after that test, including if the test fail
 ## Integration and migration
 
 Read [the compatibility contract](docs/COMPATIBILITY.md), [migration mapping and approval gates](docs/MIGRATION.md), and [security/update requirements](docs/SECURITY.md). The compatibility database is created only on a fresh marked volume. An unmarked existing mail database is refused. Secrets are established on initialisation; editing secret files does not rotate existing database accounts.
+
+The [synthetic Workspace browser fixture](docs/WORKSPACE-TEST.md) requires a separate KVM VM with 8 GB RAM. It uses upstream legacy client images and fresh `.invalid` data. It is separate from a private recovery copy and must never be attached to live mail.
 
 `compose.production.example.json` illustrates the reviewed network and certificate inputs a later deployment would need. It is **not a cutover script**. It must not be combined with a live project, original data volume or running OO client before backup recovery, migration reconciliation, security review and owner approval. Existing Workspace cached messages and attachments live separately from backend Maildir and must be preserved in full.
 

@@ -1,0 +1,279 @@
+{
+  "date": "2026-11-06",
+  "synthetic_only": true,
+  "existing_lab": {
+    "summary": {
+      "passed": 23,
+      "total": 23
+    },
+    "tests": [
+      {
+        "test": "OO SQL account creation and alias records",
+        "passed": true,
+        "seconds": 0.02
+      },
+      {
+        "test": "Private API authentication/version response",
+        "passed": true,
+        "seconds": 0.01
+      },
+      {
+        "test": "OO mailbox SQL and API field compatibility",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "All fields referenced by OO source tables exist",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "Legacy password login upgrades to Argon2id",
+        "passed": true,
+        "seconds": 0.38
+      },
+      {
+        "test": "Wrong passwords and disabled accounts rejected",
+        "passed": true,
+        "seconds": 7.85
+      },
+      {
+        "test": "Authenticated SMTP to IMAP with binary attachment",
+        "passed": true,
+        "seconds": 8.54
+      },
+      {
+        "test": "Inbound SMTP to local mailbox",
+        "passed": true,
+        "seconds": 0.29
+      },
+      {
+        "test": "Alias and group multi-recipient delivery",
+        "passed": true,
+        "seconds": 1.17
+      },
+      {
+        "test": "Open relay blocked and TLS enforced",
+        "passed": true,
+        "seconds": 0.02
+      },
+      {
+        "test": "OO SQL password change remains compatible",
+        "passed": true,
+        "seconds": 0.26
+      },
+      {
+        "test": "Custom folder, draft, subscription and flags",
+        "passed": true,
+        "seconds": 0.22
+      },
+      {
+        "test": "OO cleanup API retains byte-identical messages",
+        "passed": true,
+        "seconds": 0.53
+      },
+      {
+        "test": "Spam training origin validation and SSRF prevention",
+        "passed": true,
+        "seconds": 4.04
+      },
+      {
+        "test": "OO DKIM records produce verifiable outgoing signatures",
+        "passed": true,
+        "seconds": 4.51
+      },
+      {
+        "test": "GTUBE spam and EICAR antivirus rejection",
+        "passed": true,
+        "seconds": 0.43
+      },
+      {
+        "test": "API token creation and revocation",
+        "passed": true,
+        "seconds": 0.03
+      },
+      {
+        "test": "IMAP STARTTLS and secure POP3 access",
+        "passed": true,
+        "seconds": 0.39
+      },
+      {
+        "test": "Authenticated sender ownership enforcement",
+        "passed": true,
+        "seconds": 0.17
+      },
+      {
+        "test": "Mailbox quota enforcement",
+        "passed": true,
+        "seconds": 0.19
+      },
+      {
+        "test": "ManageSieve TLS authentication and filter delivery",
+        "passed": true,
+        "seconds": 0.69
+      },
+      {
+        "test": "Runtime has no default outbound route",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "Record message hash and UID state for restart trial",
+        "passed": true,
+        "seconds": 0.37
+      }
+    ]
+  },
+  "fresh_install_final_images": {
+    "summary": {
+      "passed": 23,
+      "total": 23
+    },
+    "tests": [
+      {
+        "test": "OO SQL account creation and alias records",
+        "passed": true,
+        "seconds": 0.02
+      },
+      {
+        "test": "Private API authentication/version response",
+        "passed": true,
+        "seconds": 0.01
+      },
+      {
+        "test": "OO mailbox SQL and API field compatibility",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "All fields referenced by OO source tables exist",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "Legacy password login upgrades to Argon2id",
+        "passed": true,
+        "seconds": 0.36
+      },
+      {
+        "test": "Wrong passwords and disabled accounts rejected",
+        "passed": true,
+        "seconds": 7.89
+      },
+      {
+        "test": "Authenticated SMTP to IMAP with binary attachment",
+        "passed": true,
+        "seconds": 8.65
+      },
+      {
+        "test": "Inbound SMTP to local mailbox",
+        "passed": true,
+        "seconds": 0.29
+      },
+      {
+        "test": "Alias and group multi-recipient delivery",
+        "passed": true,
+        "seconds": 1.07
+      },
+      {
+        "test": "Open relay blocked and TLS enforced",
+        "passed": true,
+        "seconds": 0.02
+      },
+      {
+        "test": "OO SQL password change remains compatible",
+        "passed": true,
+        "seconds": 0.2
+      },
+      {
+        "test": "Custom folder, draft, subscription and flags",
+        "passed": true,
+        "seconds": 0.26
+      },
+      {
+        "test": "OO cleanup API retains byte-identical messages",
+        "passed": true,
+        "seconds": 0.47
+      },
+      {
+        "test": "Spam training origin validation and SSRF prevention",
+        "passed": true,
+        "seconds": 3.03
+      },
+      {
+        "test": "OO DKIM records produce verifiable outgoing signatures",
+        "passed": true,
+        "seconds": 4.48
+      },
+      {
+        "test": "GTUBE spam and EICAR antivirus rejection",
+        "passed": true,
+        "seconds": 0.41
+      },
+      {
+        "test": "API token creation and revocation",
+        "passed": true,
+        "seconds": 0.03
+      },
+      {
+        "test": "IMAP STARTTLS, POP3S and SMTP 465 delivery",
+        "passed": true,
+        "seconds": 0.93
+      },
+      {
+        "test": "Authenticated sender ownership enforcement",
+        "passed": true,
+        "seconds": 0.15
+      },
+      {
+        "test": "Mailbox quota enforcement",
+        "passed": true,
+        "seconds": 0.28
+      },
+      {
+        "test": "ManageSieve TLS authentication and filter delivery",
+        "passed": true,
+        "seconds": 0.63
+      },
+      {
+        "test": "Runtime has no default outbound route",
+        "passed": true,
+        "seconds": 0.0
+      },
+      {
+        "test": "Record message hash and UID state for restart trial",
+        "passed": true,
+        "seconds": 0.34
+      }
+    ]
+  },
+  "recovery": [
+    {
+      "test": "Restart preserves mail bytes and UIDVALIDITY",
+      "passed": true
+    },
+    {
+      "test": "Scanner outage produces retryable SMTP failure",
+      "passed": true
+    }
+  ],
+  "data_volume_guard": [
+    {
+      "test": "Unmarked existing data refused before ownership or content changes",
+      "passed": true
+    }
+  ],
+  "actual_workspace_browser_tested": false,
+  "private_data_migration_tested": false,
+  "production_changed": false,
+  "production_ready": false,
+  "offline_preservation_tests": {
+    "passed": 19,
+    "total": 19,
+    "platforms": [
+      "macOS",
+      "Linux"
+    ],
+    "fixture": "temporary synthetic data only"
+  }
+}

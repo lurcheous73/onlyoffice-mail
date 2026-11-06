@@ -1,0 +1,39 @@
+name: Synthetic mail lab
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified 2026-11-06
+        with:
+          persist-credentials: false
+      - name: Offline preservation checks
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Prepare isolated synthetic state
+        run: python3 tools/prepare.py
+      - name: Build runtime and test images
+        run: docker compose -f compose.json build
+      - name: Download current antivirus signatures
+        run: docker compose -f compose.json --profile maintenance run --rm signature-update
+      - name: Start private lab
+        run: docker compose -f compose.json up -d
+      - name: Test OO contracts and actual mail protocols
+        run: sh tools/test.sh
+      - name: Restart and check mail continuity
+        run: |
+          docker compose -f compose.json restart
+          docker compose -f compose.json run --rm --use-aliases tests python3 persistence.py
+      - name: Prove temporary deferral when antivirus is unavailable
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'docker compose -f compose.json up -d clamav' EXIT
+          docker compose -f compose.json stop clamav
+          docker compose -f compose.json run --rm --no-deps tests python3 scanner_failure.py
+      - name: Stop lab and retain volumes
+        if: always()
+        run: docker compose -f compose.json stop

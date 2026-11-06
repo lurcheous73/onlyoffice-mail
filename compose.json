@@ -1,0 +1,404 @@
+{
+  "name": "oo-mail-lab",
+  "services": {
+    "database": {
+      "build": {
+        "context": ".",
+        "dockerfile": "db/Dockerfile"
+      },
+      "image": "oo-mailserver-database:dev",
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "database:/var/lib/mysql"
+      ],
+      "secrets": [
+        "reader_db",
+        "auth_db",
+        "api_db",
+        "oo_db",
+        "api_token"
+      ],
+      "mem_limit": "512m",
+      "restart": "no",
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "mariadb-admin",
+          "ping",
+          "--silent"
+        ],
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 40
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ]
+    },
+    "mail": {
+      "build": {
+        "context": ".",
+        "dockerfile": "mail/Dockerfile"
+      },
+      "image": "oo-mailserver-mail:dev",
+      "hostname": "mail.lab.invalid",
+      "environment": {
+        "MAIL_HOSTNAME": "mail.lab.invalid"
+      },
+      "networks": {
+        "private": {
+          "aliases": [
+            "mail.lab.invalid"
+          ]
+        }
+      },
+      "volumes": [
+        "maildata:/var/vmail",
+        "queue:/var/spool/postfix",
+        {
+          "type": "bind",
+          "source": "./.state/tls/server.crt",
+          "target": "/run/tls/server.crt",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "./.state/tls/server.key",
+          "target": "/run/tls/server.key",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ],
+      "secrets": [
+        "reader_db",
+        "auth_db"
+      ],
+      "mem_limit": "768m",
+      "restart": "no",
+      "depends_on": {
+        "database": {
+          "condition": "service_healthy"
+        },
+        "filter": {
+          "condition": "service_started"
+        },
+        "clamav": {
+          "condition": "service_healthy"
+        }
+      },
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "-c",
+          "import socket; socket.create_connection(('127.0.0.1',993),2).close();socket.create_connection(('127.0.0.1',587),2).close()"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 30,
+        "start_period": "20s"
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ]
+    },
+    "api": {
+      "build": {
+        "context": ".",
+        "dockerfile": "api/Dockerfile"
+      },
+      "image": "oo-mailserver-api:dev",
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "maildata:/var/vmail"
+      ],
+      "secrets": [
+        "api_db"
+      ],
+      "mem_limit": "128m",
+      "restart": "no",
+      "depends_on": {
+        "database": {
+          "condition": "service_healthy"
+        },
+        "mail": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "TRAINING_ORIGINS": "http://oo-fixture:8080"
+      },
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8081/health',timeout=2)"
+        ],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 30
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ],
+      "pids_limit": 100
+    },
+    "filter": {
+      "build": {
+        "context": ".",
+        "dockerfile": "filter/Dockerfile"
+      },
+      "image": "oo-mailserver-filter:dev",
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "filterdata:/var/lib/rspamd",
+        "dkim:/dkim:ro"
+      ],
+      "mem_limit": "384m",
+      "restart": "no",
+      "secrets": [
+        "filter_password"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ],
+      "pids_limit": 100
+    },
+    "tests": {
+      "build": {
+        "context": ".",
+        "dockerfile": "tests/Dockerfile"
+      },
+      "image": "oo-mailserver-tests:dev",
+      "profiles": [
+        "test"
+      ],
+      "networks": {
+        "private": {
+          "aliases": [
+            "oo-fixture"
+          ]
+        }
+      },
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "./.state/tls/ca.crt",
+          "target": "/run/tls/ca.crt",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        "maildata:/var/vmail"
+      ],
+      "secrets": [
+        "oo_db",
+        "api_token"
+      ],
+      "mem_limit": "384m",
+      "depends_on": {
+        "mail": {
+          "condition": "service_healthy"
+        },
+        "api": {
+          "condition": "service_healthy"
+        },
+        "worker": {
+          "condition": "service_started"
+        },
+        "redis": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "DB_USER": "oo_admin",
+        "DB_SECRET": "oo_db"
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ]
+    },
+    "redis": {
+      "build": {
+        "context": ".",
+        "dockerfile": "filter/Dockerfile.redis"
+      },
+      "image": "oo-mailserver-redis:dev",
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "redisdata:/data"
+      ],
+      "mem_limit": "96m",
+      "restart": "no",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ],
+      "pids_limit": 100
+    },
+    "worker": {
+      "image": "oo-mailserver-api:dev",
+      "command": [
+        "python3",
+        "worker.py"
+      ],
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "dkim:/dkim"
+      ],
+      "secrets": [
+        "api_db",
+        "filter_password"
+      ],
+      "mem_limit": "128m",
+      "restart": "no",
+      "environment": {
+        "TRAINING_ORIGINS": "http://oo-fixture:8080"
+      },
+      "depends_on": {
+        "database": {
+          "condition": "service_healthy"
+        },
+        "filter": {
+          "condition": "service_started"
+        }
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ],
+      "pids_limit": 100
+    },
+    "clamav": {
+      "build": {
+        "context": ".",
+        "dockerfile": "antivirus/Dockerfile"
+      },
+      "image": "oo-mailserver-antivirus:dev",
+      "networks": [
+        "private"
+      ],
+      "volumes": [
+        "signatures:/var/lib/clamav"
+      ],
+      "mem_limit": "1536m",
+      "restart": "no",
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "-c",
+          "import socket;s=socket.create_connection(('127.0.0.1',3310),2);s.sendall(b'zPING\\0');assert b'PONG' in s.recv(32)"
+        ],
+        "interval": "15s",
+        "timeout": "5s",
+        "retries": 30,
+        "start_period": "120s"
+      },
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ]
+    },
+    "signature-update": {
+      "build": {
+        "context": ".",
+        "dockerfile": "antivirus/Dockerfile"
+      },
+      "image": "oo-mailserver-antivirus:dev",
+      "command": [
+        "update"
+      ],
+      "profiles": [
+        "maintenance"
+      ],
+      "networks": [
+        "updates"
+      ],
+      "volumes": [
+        "signatures:/var/lib/clamav"
+      ],
+      "mem_limit": "384m",
+      "restart": "no",
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "NET_RAW"
+      ]
+    }
+  },
+  "networks": {
+    "private": {
+      "internal": true
+    },
+    "updates": {}
+  },
+  "volumes": {
+    "database": {},
+    "maildata": {},
+    "queue": {},
+    "filterdata": {},
+    "dkim": {},
+    "redisdata": {},
+    "signatures": {}
+  },
+  "secrets": {
+    "reader_db": {
+      "file": "./.state/secrets/reader_db"
+    },
+    "auth_db": {
+      "file": "./.state/secrets/auth_db"
+    },
+    "api_db": {
+      "file": "./.state/secrets/api_db"
+    },
+    "oo_db": {
+      "file": "./.state/secrets/oo_db"
+    },
+    "api_token": {
+      "file": "./.state/secrets/api_token"
+    },
+    "filter_password": {
+      "file": "./.state/secrets/filter_password"
+    }
+  }
+}

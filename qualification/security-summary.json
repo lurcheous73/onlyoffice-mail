@@ -1,0 +1,50 @@
+{
+  "scanner": "Trivy 0.76.2",
+  "date": "2026-11-06",
+  "no_ignore_rules": true,
+  "release_gate_passed": false,
+  "images": {
+    "database": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "report_sha256": "49616cd504950a723193c044eb72583340ffaf3ba27d6d35f69b4d7be0b163ca"
+    },
+    "mail": {
+      "high": 96,
+      "critical": 4,
+      "unique_cves": 36,
+      "secret_findings": 0,
+      "report_sha256": "887f5a1b97f9dad877714308774cd24a5a073e5b5f5f633b58513d8c1a20582e"
+    },
+    "api": {
+      "high": 78,
+      "critical": 0,
+      "unique_cves": 27,
+      "secret_findings": 0,
+      "report_sha256": "55f6bac613065e87a4ea13401d4f32d6cfd6a8c7c111758573953476aaf01428"
+    },
+    "filter": {
+      "high": 83,
+      "critical": 1,
+      "unique_cves": 30,
+      "secret_findings": 0,
+      "report_sha256": "e7b3d97ba616c4eb02115e0d1ef01ad6c16ced79eda8018fe67edecaf54e49ce"
+    },
+    "antivirus": {
+      "high": 0,
+      "critical": 0,
+      "unique_cves": 0,
+      "secret_findings": 0,
+      "report_sha256": "c5c7810746692955315c4b4467c9ae72d59d26bbc33f448acb9488fe483eb04c"
+    },
+    "redis": {
+      "high": 50,
+      "critical": 0,
+      "unique_cves": 14,
+      "secret_findings": 0,
+      "report_sha256": "cdbd253101f5da5f63d1308fbf6865be3bf42530fc34b8c77744bdca776c0d84"
+    }
+  }
+}

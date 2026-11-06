@@ -1,0 +1,66 @@
+{
+  "recorded_at": "2026-11-06T09:33:37.823014+00:00",
+  "images": {
+    "database": {
+      "Id": "sha256:fe06b105eb6d4fe05ccf1c07e67d568dda28326b7b42b814965f176a5c67cf38",
+      "RepoDigests": [],
+      "Created": "2026-11-06T09:20:17.078518473Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-database:dev"
+    },
+    "mail": {
+      "Id": "sha256:5f156e387d9579c0aa5bd8726635bea0bb2fa1ea4f99578f8916a740c9a46b9e",
+      "RepoDigests": [],
+      "Created": "2026-11-06T09:29:06.151355497Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-mail:dev"
+    },
+    "api": {
+      "Id": "sha256:602c4018f710fc551b7451e7c7a5d38fadb3ea1ca64c375ae7450108c4ea9e5e",
+      "RepoDigests": [],
+      "Created": "2026-11-06T09:29:06.93315162Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-api:dev"
+    },
+    "filter": {
+      "Id": "sha256:0e6e7de86e982d4f73a08ec12994d8e92891ecbd308188d4b4a0437f33810dd6",
+      "RepoDigests": [],
+      "Created": "2026-11-06T08:49:38.275962818Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-filter:dev"
+    },
+    "antivirus": {
+      "Id": "sha256:f82a37f8028261fd74bc2ed8f7601fa25725e2ae5a043fcd900f7809a62569f1",
+      "RepoDigests": [],
+      "Created": "2026-11-06T09:23:17.738673035Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-antivirus:dev"
+    },
+    "redis": {
+      "Id": "sha256:752fefbe268b0c5698e331c1af60325b2a5bea0550a1ae2aa809d4eaa387962f",
+      "RepoDigests": [],
+      "Created": "2026-11-06T08:34:28.694720129Z",
+      "Architecture": "amd64",
+      "Os": "linux",
+      "tag": "oo-mailserver-redis:dev"
+    }
+  },
+  "components": {
+    "postfix": "3.10.13",
+    "dovecot": "2.4.1-4 (7d8c0e5759)",
+    "mariadb": "mariadbd  Ver 11.8.9-MariaDB-ubu2404 for debian-linux-gnu on x86_64 (mariadb.org binary distribution)",
+    "rspamd": "Rspamd daemon version 3.12.1\n\nCPU architecture x86_64; features: avx2, avx, sse2, sse3, ssse3, sse4.1, sse4.2, rdrand\nHyperscan enabled: TRUE\nJemalloc enabled: TRUE\nLuaJIT enabled: TRUE (LuaJIT version: LuaJIT 2.1.1737090214)\nASAN enabled: FALSE\nBLAS enabled: FALSE\nFasttext enabled: FALSE",
+    "clamav": "ClamAV 1.5.4",
+    "redis": "Redis server v=8.0.2 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=b843bbd074c0e1da",
+    "loaded_connector_provenance": {
+      "source": "mariadb:11.8.9@sha256:c4124d1afa875e47f2892edf26b482fa54f796e2f342d3717a04ca091a22a9bd",
+      "connector_version": "3.4.10"
+    }
+  },
+  "scope": "build metadata only; no mail data or credentials mounted"
+}

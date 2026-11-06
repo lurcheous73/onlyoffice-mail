@@ -1,0 +1,21 @@
+{
+  "communityserver": {
+    "repository": "https://github.com/ONLYOFFICE/CommunityServer",
+    "commit": "fe1fa7babd093969e939ba6ff45a9fee1299dc93"
+  },
+  "legacy_mailserver": {
+    "repository": "https://github.com/ONLYOFFICE/Docker-MailServer",
+    "commit": "7fecd1afba2ccc2a967445aef8001cf0ced97b0b"
+  },
+  "iredmail_reference": {
+    "repository": "https://github.com/iredmail/iRedMail",
+    "tag": "1.8.9",
+    "commit": "5abb0d73bb8d968cab473b1117ab5668a4b738ea"
+  },
+  "base_images": {
+    "debian": "debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2",
+    "mariadb": "mariadb:11.8.9@sha256:c4124d1afa875e47f2892edf26b482fa54f796e2f342d3717a04ca091a22a9bd",
+    "clamav": "clamav/clamav:1.5.4_base@sha256:58168cd4f48a118c7d20b76da8ffce97e579b84ed7e6d1e977c6e22b1e989c5a"
+  },
+  "scanner": "Trivy 0.76.2; high/critical reports retained without suppression"
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "capture_id": "replace-with-backup-identifier",
+  "consistency_evidence": "Replace with the exact coordinated snapshot/export record; a live tar is not a coherent backup.",
+  "versions": {"communityserver": "12.8.0.1971", "mysql": "8.4.0"},
+  "databases": ["onlyoffice", "onlyoffice_mailserver"],
+  "artifacts": {
+    "database.sql": {"bytes": 0, "sha256": "REPLACE"},
+    "community-data.tar.gz": {"bytes": 0, "sha256": "REPLACE"},
+    "mail-data.tar.gz": {"bytes": 0, "sha256": "REPLACE"},
+    "configuration.tar.gz": {"bytes": 0, "sha256": "REPLACE"}
+  }
+}

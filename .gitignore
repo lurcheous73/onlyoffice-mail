@@ -1,0 +1,9 @@
+.state/
+__pycache__/
+*.pyc
+*.sqlite
+*.sqlite-journal
+*.sql.gz
+*.tar.gz
+scan-*.json
+compose.freshcheck.json

@@ -1,0 +1,54 @@
+{
+  "source_commit": "fe1fa7babd093969e939ba6ff45a9fee1299dc93",
+  "scope": "OO direct SQL interface extracted from source table definitions",
+  "tables": {
+    "alias": [
+      "address",
+      "goto",
+      "domain",
+      "created",
+      "modified",
+      "active",
+      "islist"
+    ],
+    "mailbox": [
+      "username",
+      "password",
+      "name",
+      "maildir",
+      "maxquota",
+      "quota",
+      "local_part",
+      "domain",
+      "created",
+      "modified",
+      "active",
+      "enableimap",
+      "enableimapsecured",
+      "enablepop3",
+      "enablepop3secured",
+      "enabledeliver",
+      "enablelda"
+    ],
+    "domain": [
+      "domain",
+      "description",
+      "aliases",
+      "mailboxes",
+      "maxquota",
+      "quota",
+      "transport",
+      "backupmx",
+      "created",
+      "modified",
+      "active"
+    ],
+    "dkim": [
+      "id",
+      "domain_name",
+      "selector",
+      "private_key",
+      "public_key"
+    ]
+  }
+}

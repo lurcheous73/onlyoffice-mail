@@ -1,0 +1,8 @@
+.state
+.git
+__pycache__
+**/__pycache__
+qualification
+*.zip
+*.sqlite
+compose.freshcheck.json

@@ -1,0 +1,84 @@
+{
+  "services": {
+    "mail": {
+      "hostname": "${MAIL_HOSTNAME:?Set the approved mail hostname}",
+      "environment": {
+        "MAIL_HOSTNAME": "${MAIL_HOSTNAME}",
+        "POSTMASTER_ADDRESS": "${POSTMASTER_ADDRESS:?Set approved postmaster address}"
+      },
+      "networks": {
+        "private": {},
+        "smtp_egress": {},
+        "workspace": {
+          "aliases": [
+            "oo-mail-mta"
+          ]
+        }
+      },
+      "ports": [
+        "${MAIL_BIND_ADDRESS:?Set the approved bind IP}:25:25",
+        "${MAIL_BIND_ADDRESS}:143:143",
+        "${MAIL_BIND_ADDRESS}:465:465",
+        "${MAIL_BIND_ADDRESS}:587:587",
+        "${MAIL_BIND_ADDRESS}:993:993",
+        "${MAIL_BIND_ADDRESS}:995:995",
+        "${MAIL_BIND_ADDRESS}:4190:4190"
+      ],
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "${TLS_CERT_FILE:?Set reviewed TLS certificate}",
+          "target": "/run/tls/server.crt",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        },
+        {
+          "type": "bind",
+          "source": "${TLS_KEY_FILE:?Set reviewed TLS private key}",
+          "target": "/run/tls/server.key",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ]
+    },
+    "database": {
+      "networks": {
+        "private": {},
+        "workspace": {
+          "aliases": [
+            "oo-mail-db"
+          ]
+        }
+      }
+    },
+    "api": {
+      "networks": {
+        "private": {},
+        "workspace": {
+          "aliases": [
+            "oo-mail-api"
+          ]
+        }
+      },
+      "environment": {
+        "TRAINING_ORIGINS": "${OO_TRAINING_ORIGINS:?Set approved OO origin}"
+      }
+    },
+    "worker": {
+      "environment": {
+        "TRAINING_ORIGINS": "${OO_TRAINING_ORIGINS}"
+      }
+    }
+  },
+  "networks": {
+    "smtp_egress": {},
+    "workspace": {
+      "external": true,
+      "name": "${OO_DOCKER_NETWORK:?Set existing OO network}"
+    }
+  }
+}

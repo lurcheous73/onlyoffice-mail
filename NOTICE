@@ -1,0 +1,21 @@
+OO-compatible mail backend, development candidate, November 2026.
+
+This is an independent development project. It is not an official ONLYOFFICE
+or iRedMail release, and no trademark endorsement is implied.
+
+New Python code, container definitions and configuration in this package are
+provided under Apache-2.0; see LICENSE. db/10-schema.sql retains the GPL-3.0-or-later
+licence and notices of its iRedMail/PostfixAdmin-derived source. Changes include
+the ONLYOFFICE database name, compatibility tables/fields, storage defaults and
+InnoDB table engines. See licenses/iRedMail-GPL-3.0.txt.
+
+ONLYOFFICE CommunityServer and Docker-MailServer source was consulted to
+identify integration contracts. Pinned source references are in upstream.lock.json.
+CommunityServer source and binaries are not included in this package.
+
+Images contain separately licensed Debian, MariaDB, Postfix, Dovecot, Rspamd,
+Redis, ClamAV, Python and library packages. Preserve their notices and satisfy
+their source-distribution requirements before publishing binary images. The
+MariaDB client library is copied with its copyright notice and provenance.
+The package is currently a source candidate; binary redistribution has not
+received a complete licence review.

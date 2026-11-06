@@ -1,0 +1,24 @@
+test_archive_root_metadata_is_preserved (test_backup_bundle.MigrationTests) ... ok
+test_corruption_fails_before_any_target_write (test_backup_bundle.MigrationTests) ... ok
+test_duplicate_and_file_parent_conflict (test_backup_bundle.MigrationTests) ... ok
+test_links_and_devices_rejected (test_backup_bundle.MigrationTests) ... ok
+test_missing_artifact_refused (test_backup_bundle.MigrationTests) ... ok
+test_missing_mail_key_refused (test_backup_bundle.MigrationTests) ... ok
+test_no_overwrites (test_backup_bundle.MigrationTests) ... ok
+test_parent_traversal_absolute_and_backslash_rejected (test_backup_bundle.MigrationTests) ... ok
+test_readonly_verification_has_no_output_files (test_backup_bundle.MigrationTests) ... ok
+test_success_preserves_content_and_receipt (test_backup_bundle.MigrationTests) ... ok
+test_unmarked_or_linked_destination_refused (test_backup_bundle.MigrationTests) ... ok
+test_unsupported_version_refused (test_backup_bundle.MigrationTests) ... ok
+test_exact_copy_and_internal_sieve_link (test_file_audit.FileAudit) ... ok
+test_external_link_is_refused_and_manifest_stays_incomplete (test_file_audit.FileAudit) ... ok
+test_filename_flags_and_missing_empty_directory_detected (test_file_audit.FileAudit) ... ok
+test_linked_root_and_special_file_refused (test_file_audit.FileAudit) ... ok
+test_mail_content_corruption_detected_even_same_length (test_file_audit.FileAudit) ... ok
+test_overwrite_and_manifest_inside_tree_refused (test_file_audit.FileAudit) ... ok
+test_timestamp_and_ownership_translation_are_explicit (test_file_audit.FileAudit) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.080s
+
+OK
